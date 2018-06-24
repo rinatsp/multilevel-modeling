@@ -5,11 +5,21 @@ function printFunction(f) {
     return JSON.stringify(f);
 }
 
-function applyFunction(f, input) {
+function applyFunction(f, input, conditions) {
     // return f.result === output && f.args.filter((a) => {
     //     return input.indexOf(a) > -1
     // }).length === f.args.length;
+
+    let isConditioned = true;
+    if (f.conditions) {
+        const resultConditionToEval = `(function() { var ${conditions} ; return ${f.conditions} })()`;
+        isConditioned = eval(resultConditionToEval);
+
+        console.info(`evaled ${resultConditionToEval} to ${isConditioned}`);
+    }
+
     if (
+        isConditioned &&
         f.args.filter((a) => {
             return input.indexOf(a) > -1
         }).length === f.args.length
@@ -20,7 +30,7 @@ function applyFunction(f, input) {
 }
 
 function process(functions, target) {
-    console.info(`trying to infer that ${target.to} is inferable from given start data ${target.from} and functions ${functions.map(printFunction)}`);
+    console.info(`trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} and functions ${functions.map(printFunction)}`);
 
     function begin(initialFunction, functions) {
         console.info(`trying with initial function ${printFunction(initialFunction)}, functions ${functions.map(printFunction)}`);
@@ -36,7 +46,7 @@ function process(functions, target) {
                 if (stop) {
                     return;
                 }
-                const res = applyFunction(f, localData);
+                const res = applyFunction(f, localData, target.conditions);
                 if (res && localData.indexOf(res) === -1) {
                     console.info(`function ${printFunction(f)} added new data (${res}); should reapply all functions`);
                     localPath.push(f);
@@ -53,7 +63,7 @@ function process(functions, target) {
             }
         }
 
-        const initialRes = applyFunction(initialFunction, localData);
+        const initialRes = applyFunction(initialFunction, localData, target.conditions);
         if (initialRes && localData.indexOf(initialRes) === -1) {
             localData.push(initialRes);
             if (initialRes == target.to) {

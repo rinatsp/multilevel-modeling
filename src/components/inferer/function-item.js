@@ -6,10 +6,10 @@ export default class FunctionItem extends React.Component {
     }
 
     render() {
-        const { args, result } = this.props;
+        const { args, result, conditions } = this.props;
         return (
             <span className="function-item">
-                F({args.join(',')}) -> {result}
+                F({args.join(',')}) -> {result} {conditions && `(${conditions})`}
             </span> 
         );
     }

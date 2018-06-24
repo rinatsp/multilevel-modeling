@@ -8,11 +8,13 @@ export default class Editor extends React.Component {
             functions: [
                 {
                     args: ["a", "b"],
-                    result: "c"
+                    result: "c",
+                    conditions: "a > 5"
                 },
                 {
                     args: ["b", "c"],
-                    result: "d"
+                    result: "d",
+                    conditions: "b > 10 && b < 15"
                 },
                 {
                     args: ["a", "d"],
@@ -20,7 +22,8 @@ export default class Editor extends React.Component {
                 },
                 {
                     args: ["a", "e"],
-                    result: "f"
+                    result: "f",
+                    conditions: "a > b"
                 },
                 {
                     args: ["b", "f"],
@@ -73,12 +76,14 @@ export default class Editor extends React.Component {
         try {
             f.args = this.addArgumentsNode.value.split(",").filter(str => str.length > 0);
             f.result = this.addResultNode.value;
+            f.conditions = this.addConditionsNode.value;
         } catch(e) {
             console.error(`failed to get new function: error is `, e);
         }
         if (f.args.length > 0 && f.result) {
             this.addArgumentsNode.value = "";
             this.addResultNode.value = "";
+            this.addConditionsNode.value = "";
             return f;
         }
         return null;
@@ -88,32 +93,54 @@ export default class Editor extends React.Component {
     }
     renderAdd() {
         return (
-            <div className="editor__add">
-                F(
-                    <input className="form-input" 
-                        ref={(node) => { this.addArgumentsNode = node; }}
+            <div className="editor__add" style={{ marginBottom: "15px" }}>
+                <h5>Добавить функцию</h5>
+                <p>
+                    F(
+                        <input className="form-input tooltip"
+                            data-tooltip="Введите аргументы функции через запятую"
+                            ref={(node) => { this.addArgumentsNode = node; }}
+                            type="text"
+                            placeholder="Введите аргументы функции через запятую"
+                        />
+                    ) -> <input className="form-input"
+                            type="text"
+                            ref={(node) => { this.addResultNode = node; }}
+                            placeholder="Введите результирующее значение"
+                        />&nbsp;
+                </p>
+                <p>
+                    <span>при условии&nbsp;</span>
+                    <input className="form-input"
+                        ref={(node) => { this.addConditionsNode = node; }}
                         type="text"
-                        placeholder="Введите аргументы функции через запятую"
+                        placeholder="Введите условия в форме логического выражения"
+                        style={{
+                            width: "370px"
+                        }}
                     />
-                ) -> <input className="form-input" type="text" ref={(node) => { this.addResultNode = node; }}/>&nbsp;
+                </p>
                 <button className="btn btn-primary" onClick={this.handleAdd}>Добавить</button>
             </div>
         );
     }
     renderFunctions(functions) {
         return (
-            <ol className="editor__functions">
-                {
-                    functions.map((f, index) => {
-                        return (
-                            <li key={index}>
-                                <FunctionItem {...f} /> &nbsp;
-                                <a onClick={this.handleRemove(index)}>[yдалить]</a>
-                            </li>
-                        );
-                    })
-                }
-            </ol>
+            <div>
+                <h5>Список функций</h5>
+                <ol className="editor__functions">
+                    {
+                        functions.map((f, index) => {
+                            return (
+                                <li key={index}>
+                                    <FunctionItem {...f} /> &nbsp;
+                                    <a onClick={this.handleRemove(index)}>[yдалить]</a>
+                                </li>
+                            );
+                        })
+                    }
+                </ol>
+            </div>
         );
     }
 

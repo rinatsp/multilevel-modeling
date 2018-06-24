@@ -33,10 +33,12 @@ export default class Inferer extends React.Component {
         try {
             const inferFrom = this.inferFromNode.value.split(',');
             const inferTo = this.inferToNode.value;
+            const inferConditions = this.inferConditionsNode.value;
             if (inferFrom.length > 0 && inferTo) {
                 return {
                     from: inferFrom,
-                    to: inferTo
+                    to: inferTo,
+                    conditions: inferConditions
                 };
             }
         } catch(e) {
@@ -47,22 +49,45 @@ export default class Inferer extends React.Component {
     renderInferBlock() {
         return (
             <div className="infer-block">
-                <button className="btn btn-primary" onClick={this.handleInfer}>Доказать, что</button>
-                <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a,b"/> ->
-                <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="p"/>
+                <div className="form-group">
+                    <label className="form-label">
+                        <span>Имея входные данные:</span>
+                    </label>
+                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a,b"/>
+                </div>
+                <div className="form-group">
+                    <label className="form-label">
+                        <span>И начальные условия:</span>
+                    </label>
+                    <input type="text" className="form-input infer-block__conditions" ref={(node) => { this.inferConditionsNode = node; }} defaultValue="a = 60, b = 11"/>
+                </div>
+                <div className="form-group">
+                    <label className="form-label">
+                        <span>Возможно получить:</span>
+                    </label>
+                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="p"/>
+                </div>
+                <button className="btn btn-primary" onClick={this.handleInfer}>Доказать</button>
             </div>
         );
     }
 
     render() {
-        const { functions, target } = this.state;
+        const { functions, target, conditions } = this.state;
         return (
-            <div className="main-wrapper">
-                <h3>Функции изменения состояний</h3>
-                <Editor ref={(node) => { this.editorNode = node; }}/>
-                {this.renderInferBlock()}
-                <Processor ref={(node) => { this.processorNode = node; }} functions={functions} target={target} />
+            <div className="main-wrapper container">
+                <div className="columns">
+                    <div className="column col-6">
+                        <h3>Функции изменения состояний</h3>
+                        <Editor ref={(node) => { this.editorNode = node; }}/>
+                    </div>
+                    <div className="column col-6">
+                        <h3>Вывод</h3>
+                        {this.renderInferBlock()}
+                        <Processor ref={(node) => { this.processorNode = node; }} functions={functions} target={target} conditions={conditions} />
+                    </div>
+                </div>
             </div> 
-        );
+        )
     }
 }
