@@ -84,7 +84,7 @@ export default class Inferer extends React.Component {
                         {this.renderInferBlock()}
                         <Processor
                             ref={(node) => { this.processorNode = node; }}
-                            functions={items[0] ? items[0].functions : []}
+                            items={items}
                             target={target}
                             conditions={conditions}
                         />

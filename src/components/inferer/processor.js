@@ -30,67 +30,92 @@ function applyFunction(f, input, conditions) {
     return null;
 }
 
-function process(functions, target) {
-    console.info(`trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} and functions ${functions.map(printFunction)}`);
+function processMultilevel(items, target) {
+    console.info(`trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} on ${items.length} items`);
 
-    function begin(initialFunction, functions) {
-        console.info(`trying with initial function ${printFunction(initialFunction)}, functions ${functions.map(printFunction)}`);
+    const path = [];
 
-        const localPath = [initialFunction];
-        const localData = [...target.from];
+    // recursive
+    function processItem(item, target) {
+        const { level, functions } = item;
+        const childItems = _.find(items, (i) => {
+            return i.parentId === item.id;
+        });
 
-        function iterate(functions) {
-            console.info(`iterating through functions ${functions.map(printFunction)}; localData is ${JSON.stringify(localData)}`);
-            let hasNewData = false;
-            let stop = false;
-            functions.forEach((f) => {
-                if (stop) {
-                    return;
-                }
-                const res = applyFunction(f, localData, target.conditions);
-                if (res && localData.indexOf(res) === -1) {
-                    console.info(`function ${printFunction(f)} added new data (${res}); should reapply all functions`);
-                    localPath.push(f);
-                    localData.push(res);
-                    if (res == target.to) {
-                        console.info(`done; found ${target.to}; returning`);
-                        stop = true;
+        console.info(`[level ${level}] trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} and functions ${functions.map(printFunction)}`);
+
+        function begin(initialFunction, functions) {
+            console.info(`[level ${level}] trying with initial function ${printFunction(initialFunction)}, functions ${functions.map(printFunction)}`);
+
+            const localPath = [initialFunction];
+            const localData = [...target.from];
+
+            function iterate(functions) {
+                console.info(`[level ${level}] iterating through functions ${functions.map(printFunction)}; localData is ${JSON.stringify(localData)}`);
+                let hasNewData = false;
+                let stop = false;
+                functions.forEach((f) => {
+                    if (stop) {
+                        return;
                     }
-                    hasNewData = true;
+                    const res = applyFunction(f, localData, target.conditions);
+                    if (res && localData.indexOf(res) === -1) {
+                        console.info(`[level ${level}] function ${printFunction(f)} added new data (${res}); should reapply all functions`);
+                        localPath.push(f);
+                        localData.push(res);
+                        if (res == target.to) {
+                            console.info(`[level ${level}] done; found ${target.to}; returning`);
+                            stop = true;
+                        }
+                        hasNewData = true;
+                    }
+                });
+                if (hasNewData && !stop) {
+                    iterate(functions);
                 }
+            }
+
+            const initialRes = applyFunction(initialFunction, localData, target.conditions);
+            if (initialRes && localData.indexOf(initialRes) === -1) {
+                localData.push(initialRes);
+                if (initialRes == target.to) {
+                    console.info(`[level ${level}] done; found ${target.to}; returning`);
+                } else {
+                    iterate(functions);
+                }
+            }
+
+            if (localData.indexOf(target.to) > -1) {
+                console.info(`[level ${level}] ok, found target output; returning path`);
+                return localPath;
+            }
+            console.info(`[level ${level}] not found target output in result data for initial function ${printFunction(initialFunction)}`);
+            return null;
+        }
+
+        const resultPaths = functions.map((f, index) => {
+            return begin(f, functions.filter((a, i) => {
+                return i !== index;
+            }));
+        }).filter(p => p);
+
+        console.info(`result paths are: `, resultPaths);
+
+        if (resultPaths.length > 0) {
+            path.append({
+                item,
+                path: resultPaths
             });
-            if (hasNewData && !stop) {
-                iterate(functions);
-            }
         }
-
-        const initialRes = applyFunction(initialFunction, localData, target.conditions);
-        if (initialRes && localData.indexOf(initialRes) === -1) {
-            localData.push(initialRes);
-            if (initialRes == target.to) {
-                console.info(`done; found ${target.to}; returning`);
-            } else {
-                iterate(functions);
-            }
-        }
-
-        if (localData.indexOf(target.to) > -1) {
-            console.info(`ok, found target output; returning path`);
-            return localPath;
-        }
-        console.info(`not found target output in result data for initial function ${printFunction(initialFunction)}`);
-        return null;
     }
 
-    const resultPaths = functions.map((f, index) => {
-        return begin(f, functions.filter((a, i) => {
-            return i !== index;
-        }));
-    }).filter(p => p);
+    const rootItem = _.find(items, (i) => {
+        return !i.parentId;
+    });
 
-    console.info(`result paths are: `, resultPaths);
+    processItem(rootItem, target);
 
-    return resultPaths;
+    return path;
 }
 
 function backwardResult(steps, target) {
@@ -132,9 +157,9 @@ export default class Processor extends React.Component {
 
     }
     process() {
-        const { functions, target } = this.props;
-        if (target && functions) {
-            const result = process(functions, target);
+        const { items, target } = this.props;
+        if (target && items) {
+            const result = process(items, target);
             this.setState({
                 result
             });
@@ -142,7 +167,7 @@ export default class Processor extends React.Component {
     }
     printResult(result) {
         return result.map((r) => {
-            const br = backwardResult(r, this.props.target);
+            /* const br = backwardResult(r, this.props.target); */
             return (
                 <div>
                     <p>Прямой ход:</p>
@@ -155,6 +180,7 @@ export default class Processor extends React.Component {
                             );
                         })}
                     </ol>
+                    {/*
                     <p>Обратный ход:</p>
                     <ol>
                         {br.map((f) => {
@@ -165,14 +191,15 @@ export default class Processor extends React.Component {
                             );
                         })}
                     </ol>
+                    */}
                 </div>
             );
         });
     }
 
     render() {
-        const { target, functions } = this.props;
-        if (!target || !functions) {
+        const { target, items } = this.props;
+        if (!target || !items) {
             return null;
         }
         const { result } = this.state;
