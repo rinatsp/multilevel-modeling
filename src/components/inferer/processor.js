@@ -1,5 +1,6 @@
 import React from 'react';
 import FunctionItem from './function-item';
+import _ from 'lodash';
 
 function printFunction(f) {
     return JSON.stringify(f);
@@ -82,7 +83,7 @@ function process(functions, target) {
     }
 
     const resultPaths = functions.map((f, index) => {
-        return begin(f, functions.filter((_, i) => {
+        return begin(f, functions.filter((a, i) => {
             return i !== index;
         }));
     }).filter(p => p);
@@ -94,30 +95,27 @@ function process(functions, target) {
 
 function backwardResult(steps, target) {
     const backwardSteps = [];
-    const notFoundInitialData = [...target.from];
 
-    let initialBackwardStep;
-    steps.forEach((s) => {
-        if (s.result == target.to) {
-            initialBackwardStep = s;
+    function iterate(arg) {
+        console.info(`iterating: finding out, which function satisfy the result ${arg}`);
+
+        if (target.from.indexOf(arg) > -1) {
+            console.info(`found arg ${arg} in initial data; that's ok, do nothing more for it`);
+        } else {
+            const f = _.find(steps, (s) => {
+                return s.result === arg;
+            });
+            if (f) {
+                console.info(`got it! found function ${f}, putting it to backward steps and finding steps for args`);
+                backwardSteps.push(f);
+                f.args.forEach(iterate);
+            } else {
+                console.warn(`not found arg ${arg} neither in initial data nor in current function; wtf?`);
+            }
         }
-    });
-
-    console.info(`initial backward step is `, initialBackwardStep);
-
-    backwardSteps.push(initialBackwardStep);
-    const backwardData = [target.to, ...initialBackwardStep.args];
-
-    function checkBackwardData() {
-        return target.from.filter((f) => {
-            return backwardData.indexOf(f) > -1;
-        }).length === target.from.length;
     }
 
-    function iterate() {
-        
-
-    }
+    iterate(target.to);
 
     return backwardSteps.reverse();
 }
@@ -157,16 +155,16 @@ export default class Processor extends React.Component {
                             );
                         })}
                     </ol>
-{/*                    <p>Обратный ход:</p>
+                    <p>Обратный ход:</p>
                     <ol>
-                        {backwardResult.map((f) => {
+                        {br.map((f) => {
                             return (
                                 <li>
                                     <FunctionItem {...f} />
                                 </li>
                             );
                         })}
-                    </ol>*/}
+                    </ol>
                 </div>
             );
         });
@@ -187,7 +185,7 @@ export default class Processor extends React.Component {
                         </div> :
                         "Вывод невозможен"
                 }
-            </div> 
+            </div>
         );
     }
 }

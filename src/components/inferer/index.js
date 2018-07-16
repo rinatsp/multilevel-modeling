@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Editor from './editor';
+import LevelEditor from './level-editor';
 import Processor from './processor';
 
 export default class Inferer extends React.Component {
@@ -8,7 +8,7 @@ export default class Inferer extends React.Component {
         super();
         this.state = {
             target: null,
-            functions: []
+            items: []
         };
 
         this.handleInfer = () => {
@@ -16,7 +16,7 @@ export default class Inferer extends React.Component {
             if (t) {
                 this.setState({
                     target: t,
-                    functions: this.editorNode.getData()
+                    items: this.levelEditorNode.getData()
                 }, () => {
                     this.processorNode.process();
                 });
@@ -27,7 +27,7 @@ export default class Inferer extends React.Component {
 
     }
     componentWillUnmount() {
-    
+
     }
     getTarget() {
         try {
@@ -41,7 +41,7 @@ export default class Inferer extends React.Component {
                     conditions: inferConditions
                 };
             }
-        } catch(e) {
+        } catch (e) {
             console.error(`failed to get infer target: `, e);
             return null;
         }
@@ -53,19 +53,19 @@ export default class Inferer extends React.Component {
                     <label className="form-label">
                         <span>Имея входные данные:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a,b"/>
+                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a,b" />
                 </div>
                 <div className="form-group">
                     <label className="form-label">
                         <span>И начальные условия:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__conditions" ref={(node) => { this.inferConditionsNode = node; }} defaultValue="a = 60, b = 11"/>
+                    <input type="text" className="form-input infer-block__conditions" ref={(node) => { this.inferConditionsNode = node; }} defaultValue="a = 60, b = 11" />
                 </div>
                 <div className="form-group">
                     <label className="form-label">
                         <span>Возможно получить:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="p"/>
+                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="p" />
                 </div>
                 <button className="btn btn-primary" onClick={this.handleInfer}>Доказать</button>
             </div>
@@ -73,21 +73,24 @@ export default class Inferer extends React.Component {
     }
 
     render() {
-        const { functions, target, conditions } = this.state;
+        const { items, target, conditions } = this.state;
         return (
             <div className="main-wrapper container">
+                <LevelEditor ref={(node) => { this.levelEditorNode = node; }} />
+                <hr />
                 <div className="columns">
-                    <div className="column col-6">
-                        <h3>Функции изменения состояний</h3>
-                        <Editor ref={(node) => { this.editorNode = node; }}/>
-                    </div>
-                    <div className="column col-6">
+                    <div className="column">
                         <h3>Вывод</h3>
                         {this.renderInferBlock()}
-                        <Processor ref={(node) => { this.processorNode = node; }} functions={functions} target={target} conditions={conditions} />
+                        <Processor
+                            ref={(node) => { this.processorNode = node; }}
+                            functions={items[0] ? items[0].functions : []}
+                            target={target}
+                            conditions={conditions}
+                        />
                     </div>
                 </div>
-            </div> 
-        )
+            </div>
+        );
     }
 }

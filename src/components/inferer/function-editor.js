@@ -4,61 +4,21 @@ import FunctionItem from './function-item';
 export default class Editor extends React.Component {
     constructor() {
         super();
-        this.state = {
-            functions: [
-                {
-                    args: ["a", "b"],
-                    result: "c",
-                    conditions: "a > 5"
-                },
-                {
-                    args: ["b", "c"],
-                    result: "d",
-                    conditions: "b > 10 && b < 15"
-                },
-                {
-                    args: ["a", "d"],
-                    result: "e"
-                },
-                {
-                    args: ["a", "e"],
-                    result: "f",
-                    conditions: "a > b"
-                },
-                {
-                    args: ["b", "f"],
-                    result: "g"
-                },
-                {
-                    args: ["c", "g"],
-                    result: "h"
-                },
-                {
-                    args: ["a", "g"],
-                    result: "b"
-                },
-                {
-                    args: ["g", "h"],
-                    result: "p"
-                }
-            ]
-        };
+        this.state = {};
 
         this.handleAdd = () => {
             const newFunction = this.getNewFunction();
             if (newFunction) {
-                this.setState({
-                    functions: [...this.state.functions, newFunction]
-                });
+                const newFunctions = [...this.props.functions, newFunction];
+                this.props.onFunctionsChange(newFunctions);
             }
         };
         this.handleRemove = (index) => {
             return () => {
-                this.setState({
-                    functions: this.state.functions.filter((f, i) => {
-                        return i !== index;
-                    })
+                const newFunctions = this.state.functions.filter((f, i) => {
+                    return i !== index;
                 });
+                this.props.onFunctionsChange(newFunctions);
             };
         };
     }
@@ -69,7 +29,7 @@ export default class Editor extends React.Component {
 
     }
     getNewFunction() {
-        let f = {
+        const f = {
             args: [],
             result: null
         };
@@ -77,7 +37,7 @@ export default class Editor extends React.Component {
             f.args = this.addArgumentsNode.value.split(",").filter(str => str.length > 0);
             f.result = this.addResultNode.value;
             f.conditions = this.addConditionsNode.value;
-        } catch(e) {
+        } catch (e) {
             console.error(`failed to get new function: error is `, e);
         }
         if (f.args.length > 0 && f.result) {
@@ -145,12 +105,12 @@ export default class Editor extends React.Component {
     }
 
     render() {
-        const { functions } = this.state;
+        const { functions } = this.props;
         return (
             <div className="editor">
                 {this.renderAdd()}
                 {this.renderFunctions(functions)}
-            </div> 
+            </div>
         );
     }
 }

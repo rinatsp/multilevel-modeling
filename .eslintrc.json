@@ -1,0 +1,78 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "airbnb"
+    ],
+    "globals": {
+        "ultima": true,
+        "$": true,
+        "_": true,
+        "moment": true,
+        "CONFIG": true,
+        "React": true,
+        "ReactDOM": true
+    },
+    "rules": {
+        "prefer-template": [ "warn" ],
+        "camelcase": [ "warn" ],
+        "class-methods-use-this": [ "warn" ],
+        "dot-notation": [ "warn" ],
+
+        "no-console": [ "off" ],
+        "arrow-parens": [ "off" ],
+        "no-unused-expressions": [ "off" ],
+        "eol-last": [ "off" ],
+        "new-cap": [ "off" ],
+        "max-len": [ "off" ],
+        "no-underscore-dangle": [ "off" ],
+        "import/no-unresolved": [ "off" ],
+        "import/first": [ "off" ],
+        "import/no-named-as-default": [ "off" ],
+        "import/no-extraneous-dependencies": [ "off" ],
+        "arrow-body-style": [ "off" ],
+        "no-nested-ternary": [ "off" ],
+        "func-names": [ "off" ],
+        "radix": [ "off" ],
+        "eqeqeq": [ "off" ],
+        "no-restricted-syntax": [ "off" ],
+        "space-before-function-paren": [ "off" ],
+        "one-var": [ "off" ],
+        "one-var-declaration-per-line": [ "off" ],
+        "no-useless-constructor": [ "off" ],
+        "no-param-reassign": [ "off" ],
+        "guard-for-in": [ "off" ],
+        "wrap-iife": [ "off" ],
+        "no-new": [ "off" ],
+        "quotes": [ "off"],
+        "linebreak-style": [ "off"],
+        "no-use-before-define": [ "off"],
+        "no-case-declarations": [ "off" ],
+        "no-mixed-operators": [ "off" ],
+        "react/prefer-stateless-function": [ "off" ],
+        "react/jsx-no-bind": [ "off" ],
+
+        "react/prefer-es6-class": [ "warn" ],
+        "react/no-string-refs": [ "warn" ],
+        "react/no-find-dom-node": [ "warn" ],
+
+        "react/prop-types": [ "off" ],
+        "react/jsx-first-prop-new-line": [ "off" ],
+        "react/jsx-indent-props": [ "off" ],
+        "react/jsx-filename-extension": [ "off" ],
+        "react/sort-comp": [ "off" ],
+        "react/no-multi-comp": [ "off" ],
+        "react/no-deprecated": [ "off" ],
+        "react/jsx-closing-bracket-location": [ "off" ],
+        "react/no-did-update-set-state": [ "off" ],
+        "jsx-a11y/no-static-element-interactions": [ "off" ],
+        "jsx-a11y/label-has-for": [ "off" ],
+
+        "comma-dangle": [ "error", "never"],
+        "indent": ["error", 4],
+        "react/jsx-indent": ["error", 4],
+        "semi": ["error", "always"]
+    }
+}
