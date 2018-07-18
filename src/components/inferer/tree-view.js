@@ -54,7 +54,7 @@ class TreeNode extends PureComponent {
             <div className={className} onClick={expandOnItemClick ? this.handleExpandClick : () => {}}>
                 {
                     hasChildren &&
-                        <i className="fa fa-caret-right tree-view__expander" onClick={this.handleExpandClick}/>
+                        <i className="fa fa-caret-right tree-view__expander" onClick={this.handleExpandClick} />
                 }
                 <div className="tree-view__node__item">
                     {renderNode(node)}

@@ -15,7 +15,7 @@ export default class Editor extends React.Component {
         };
         this.handleRemove = (index) => {
             return () => {
-                const newFunctions = this.state.functions.filter((f, i) => {
+                const newFunctions = this.props.functions.filter((f, i) => {
                     return i !== index;
                 });
                 this.props.onFunctionsChange(newFunctions);
@@ -100,6 +100,10 @@ export default class Editor extends React.Component {
                         })
                     }
                 </ol>
+                {
+                    functions.length === 0 &&
+                        <p style={{ fontStyle: "italic" }}>Список функций пуст. Добавьте функцию с помощью формы выше</p>
+                }
             </div>
         );
     }

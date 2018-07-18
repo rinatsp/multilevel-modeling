@@ -53,7 +53,7 @@ export default class Inferer extends React.Component {
                     <label className="form-label">
                         <span>Имея входные данные:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a,b" />
+                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a1,b1,a2,b2,a3,b3" />
                 </div>
                 <div className="form-group">
                     <label className="form-label">
@@ -65,7 +65,7 @@ export default class Inferer extends React.Component {
                     <label className="form-label">
                         <span>Возможно получить:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="p" />
+                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="c4" />
                 </div>
                 <button className="btn btn-primary" onClick={this.handleInfer}>Доказать</button>
             </div>

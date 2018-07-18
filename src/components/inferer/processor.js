@@ -6,143 +6,115 @@ function printFunction(f) {
     return JSON.stringify(f);
 }
 
-function applyFunction(f, input, conditions) {
-    // return f.result === output && f.args.filter((a) => {
-    //     return input.indexOf(a) > -1
-    // }).length === f.args.length;
-
-    let isConditioned = true;
+function isConditioned(f, conditions) {
+    let result = true;
     if (f.conditions) {
         const resultConditionToEval = `(function() { var ${conditions} ; return ${f.conditions} })()`;
-        isConditioned = eval(resultConditionToEval);
-
-        console.info(`evaled ${resultConditionToEval} to ${isConditioned}`);
+        result = eval(resultConditionToEval);
     }
-
-    if (
-        isConditioned &&
-        f.args.filter((a) => {
-            return input.indexOf(a) > -1
-        }).length === f.args.length
-    ) {
-        return f.result;
-    }
-    return null;
+    return result;
 }
 
-function processMultilevel(items, target) {
-    console.info(`trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} on ${items.length} items`);
+// get the result infer path
+// @param items - all items on all levels
+// @param finalTarget - given input, output and conditions
+function processMultilevel(items, finalTarget) {
 
-    const path = [];
-
-    // recursive
-    function processItem(item, target) {
-        const { level, functions } = item;
-        const childItems = _.find(items, (i) => {
-            return i.parentId === item.id;
+    function getChildItems(item) {
+        return items.filter((i) => {
+            return i.parent === item.id;
         });
+    }
 
-        console.info(`[level ${level}] trying to infer that ${target.to} is inferable from given start data ${target.from}, conditions ${target.conditions} and functions ${functions.map(printFunction)}`);
+    // get one of child items, that's functions allow us to rich the result
+    function getItemLeadsTo(parentItem, result) {
+        return _.find(getChildItems(parentItem), (i) => {
+            const { functions } = i;
+            return _.find(functions, (f) => {
+                return isConditioned(f, finalTarget.conditions) && f.result == result;
+            });
+        });
+    }
 
-        function begin(initialFunction, functions) {
-            console.info(`[level ${level}] trying with initial function ${printFunction(initialFunction)}, functions ${functions.map(printFunction)}`);
+    // get path on given item functions to the target result
+    // @recursive
+    function process(item, target) {
+        const { functions } = item;
+        console.info(`trying to infer that ${target} is inferable from given start data ${finalTarget.from}, conditions ${finalTarget.conditions} and functions ${functions.map(printFunction)}`);
 
-            const localPath = [initialFunction];
-            const localData = [...target.from];
+        // get one of functions of the item, that allow us to rich the result
+        function getFunctionLeadsTo(result) {
+            console.debug(`looking for any function that would allow to rich result ${result}`);
+            // find in all item's functions one, who are conditioned and which result is equal to given
+            return _.find(functions, (f) => {
+                return isConditioned(f, finalTarget.conditions) && f.result == result;
+            });
+        }
 
-            function iterate(functions) {
-                console.info(`[level ${level}] iterating through functions ${functions.map(printFunction)}; localData is ${JSON.stringify(localData)}`);
-                let hasNewData = false;
-                let stop = false;
-                functions.forEach((f) => {
-                    if (stop) {
-                        return;
-                    }
-                    const res = applyFunction(f, localData, target.conditions);
-                    if (res && localData.indexOf(res) === -1) {
-                        console.info(`[level ${level}] function ${printFunction(f)} added new data (${res}); should reapply all functions`);
-                        localPath.push(f);
-                        localData.push(res);
-                        if (res == target.to) {
-                            console.info(`[level ${level}] done; found ${target.to}; returning`);
-                            stop = true;
-                        }
-                        hasNewData = true;
-                    }
-                });
-                if (hasNewData && !stop) {
-                    iterate(functions);
-                }
+        // @recursive
+        function findPath(result) {
+            console.debug(`finding path to ${result}`);
+            let localSteps = [];
+
+            // if result is presented in given data, then path length is 0
+            if (finalTarget.from.indexOf(result) > -1) {
+                console.info(`result is found in initial data; returning empty list of steps`);
+                return localSteps;
             }
 
-            const initialRes = applyFunction(initialFunction, localData, target.conditions);
-            if (initialRes && localData.indexOf(initialRes) === -1) {
-                localData.push(initialRes);
-                if (initialRes == target.to) {
-                    console.info(`[level ${level}] done; found ${target.to}; returning`);
+            const lastFunction = getFunctionLeadsTo(result);
+            if (lastFunction) {
+                console.debug(`found last function for ${result}; checking all it's arguments`);
+                // for each argument of found function, check that we can find path to it
+                const prevSteps = _.flatten(lastFunction.args.map(findPath));
+                // concat the result path
+                localSteps = [...prevSteps, lastFunction];
+            } else {
+                const lastItem = getItemLeadsTo(item, result);
+                if (lastItem) {
+                    console.debug(`found last item for ${result}; finding path inside of it`);
+                    // go down one step below on found item and current result
+                    const prevSteps = process(lastItem, result);
+                    localSteps = prevSteps;
                 } else {
-                    iterate(functions);
+                    // interrupt
+                    throw new Error(`not found any function or item that leads to ${result}`);
                 }
             }
 
-            if (localData.indexOf(target.to) > -1) {
-                console.info(`[level ${level}] ok, found target output; returning path`);
-                return localPath;
-            }
-            console.info(`[level ${level}] not found target output in result data for initial function ${printFunction(initialFunction)}`);
+            return localSteps;
+        }
+
+        try {
+            const path = findPath(target);
+            const resultPath = [];
+            console.info(`done processing; now filter duplicated functions`);
+            path.forEach((f) => {
+                if (resultPath.indexOf(f) === -1) {
+                    resultPath.push(f);
+                } else {
+                    console.debug(`function ${printFunction(f)} is already presented`);
+                }
+            });
+            return resultPath;
+        } catch (e) {
+            console.warn(`looks like target ${target} is not feasible; returning null`);
             return null;
         }
-
-        const resultPaths = functions.map((f, index) => {
-            return begin(f, functions.filter((a, i) => {
-                return i !== index;
-            }));
-        }).filter(p => p);
-
-        console.info(`result paths are: `, resultPaths);
-
-        if (resultPaths.length > 0) {
-            path.append({
-                item,
-                path: resultPaths
-            });
-        }
     }
 
+    // find root item
     const rootItem = _.find(items, (i) => {
-        return !i.parentId;
+        return !i.parent;
     });
 
-    processItem(rootItem, target);
-
-    return path;
-}
-
-function backwardResult(steps, target) {
-    const backwardSteps = [];
-
-    function iterate(arg) {
-        console.info(`iterating: finding out, which function satisfy the result ${arg}`);
-
-        if (target.from.indexOf(arg) > -1) {
-            console.info(`found arg ${arg} in initial data; that's ok, do nothing more for it`);
-        } else {
-            const f = _.find(steps, (s) => {
-                return s.result === arg;
-            });
-            if (f) {
-                console.info(`got it! found function ${f}, putting it to backward steps and finding steps for args`);
-                backwardSteps.push(f);
-                f.args.forEach(iterate);
-            } else {
-                console.warn(`not found arg ${arg} neither in initial data nor in current function; wtf?`);
-            }
-        }
+    if (!rootItem) {
+        console.warn(`no root item found; unable to process`);
+        return null;
     }
 
-    iterate(target.to);
-
-    return backwardSteps.reverse();
+    // process root item and target result
+    return process(rootItem, finalTarget.to);
 }
 
 export default class Processor extends React.Component {
@@ -151,7 +123,7 @@ export default class Processor extends React.Component {
         this.state = {};
     }
     componentDidMount() {
-        this.process();
+        // this.processMu();
     }
     componentWillUnmount() {
 
@@ -159,42 +131,27 @@ export default class Processor extends React.Component {
     process() {
         const { items, target } = this.props;
         if (target && items) {
-            const result = process(items, target);
+            const result = processMultilevel(items, target);
             this.setState({
                 result
             });
         }
     }
     printResult(result) {
-        return result.map((r) => {
-            /* const br = backwardResult(r, this.props.target); */
-            return (
-                <div>
-                    <p>Прямой ход:</p>
-                    <ol>
-                        {r.map((f, index) => {
-                            return (
-                                <li key={index}>
-                                    <FunctionItem {...f} />
-                                </li>
-                            );
-                        })}
-                    </ol>
-                    {/*
-                    <p>Обратный ход:</p>
-                    <ol>
-                        {br.map((f) => {
-                            return (
-                                <li>
-                                    <FunctionItem {...f} />
-                                </li>
-                            );
-                        })}
-                    </ol>
-                    */}
-                </div>
-            );
-        });
+        return (
+            <div>
+                <p>Прямой ход:</p>
+                <ol>
+                    {result.map((f, index) => {
+                        return (
+                            <li key={index}>
+                                <FunctionItem {...f} />
+                            </li>
+                        );
+                    })}
+                </ol>
+            </div>
+        );
     }
 
     render() {
