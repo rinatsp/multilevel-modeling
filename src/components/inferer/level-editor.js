@@ -8,57 +8,62 @@ import { saveAs } from 'file-saver/FileSaver';
 const LOCAL_STORAGE_ITEM = "levels";
 
 function getDefaultLevels() {
-    const rootId = uuid();
     return [
         {
-            id: rootId,
-            parent: null,
-            level: 1,
-            number: 1,
-            functions: [
+            "id": "baad85ac-1733-4f25-9609-e335807bbb4c",
+            "parent": null,
+            "level": 1,
+            "number": 1,
+            "functions": [
                 {
-                    args: ["a", "b"],
-                    result: "c",
-                    conditions: "a > 5"
+                    "args": [
+                        "a1",
+                        "b1"
+                    ],
+                    "result": "c1",
+                    "conditions": ""
                 },
                 {
-                    args: ["b", "c"],
-                    result: "d",
-                    conditions: "b > 10 && b < 15"
-                },
-                {
-                    args: ["a", "d"],
-                    result: "e"
-                },
-                {
-                    args: ["a", "e"],
-                    result: "f",
-                    conditions: "a > b"
-                },
-                {
-                    args: ["b", "f"],
-                    result: "g"
-                },
-                {
-                    args: ["c", "g"],
-                    result: "h"
-                },
-                {
-                    args: ["a", "g"],
-                    result: "b"
-                },
-                {
-                    args: ["g", "h"],
-                    result: "p"
+                    "args": [
+                        "c2",
+                        "c3"
+                    ],
+                    "result": "c4",
+                    "conditions": ""
                 }
             ]
         },
         {
-            id: uuid(),
-            parent: rootId,
-            level: 2,
-            number: 1,
-            functions: []
+            "id": "5aae1a46-01a0-4e8d-9e20-732d90ae117b",
+            "parent": "baad85ac-1733-4f25-9609-e335807bbb4c",
+            "level": 2,
+            "number": 1,
+            "functions": [
+                {
+                    "args": [
+                        "a2",
+                        "b2"
+                    ],
+                    "result": "c2",
+                    "conditions": ""
+                }
+            ]
+        },
+        {
+            "id": "11339e7e-5079-450c-b7ce-21f3fc71d710",
+            "parent": "baad85ac-1733-4f25-9609-e335807bbb4c",
+            "level": 2,
+            "number": 2,
+            "functions": [
+                {
+                    "args": [
+                        "a3",
+                        "b3"
+                    ],
+                    "result": "c3",
+                    "conditions": ""
+                }
+            ]
         }
     ];
 }
