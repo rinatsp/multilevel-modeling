@@ -28,6 +28,7 @@ function processMultilevel(items, finalTarget) {
 
     // get one of child items, that's functions allow us to rich the result
     function getItemLeadsTo(parentItem, result) {
+        console.debug(`looking for any item that would allow to rich result ${result}`);
         return _.find(getChildItems(parentItem), (i) => {
             const { functions } = i;
             return _.find(functions, (f) => {
@@ -70,6 +71,23 @@ function processMultilevel(items, finalTarget) {
                 // concat the result path
                 localSteps = [...prevSteps, lastFunction];
             } else {
+                const chidlItems = getChildItems(item);
+                let isFound = false;
+                console.debug(`not found last function; checking all childs`);
+                for (let i = 0; i < chidlItems.length; i++) {
+                    console.debug(`trying to check item ${chidlItems[i]}`);
+                    const prevSteps = process(chidlItems[i], result);
+                    if (prevSteps) {
+                        console.debug(`found child path: `, prevSteps);
+                        localSteps = prevSteps;
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (!isFound) {
+                    throw new Error(`not found any function or item that leads to ${result}`);
+                }
+                /*
                 const lastItem = getItemLeadsTo(item, result);
                 if (lastItem) {
                     console.debug(`found last item for ${result}; finding path inside of it`);
@@ -80,6 +98,7 @@ function processMultilevel(items, finalTarget) {
                     // interrupt
                     throw new Error(`not found any function or item that leads to ${result}`);
                 }
+                */
             }
 
             return localSteps;

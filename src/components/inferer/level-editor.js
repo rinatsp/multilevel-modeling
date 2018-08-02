@@ -7,8 +7,15 @@ import { saveAs } from 'file-saver/FileSaver';
 
 const LOCAL_STORAGE_ITEM = "levels";
 
+function getUrlParam(name) {
+    return decodeURIComponent(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,""])[1]
+    );
+};
+
+
 function getDefaultLevels() {
-    return [
+    return ﻿[
         {
             "id": "baad85ac-1733-4f25-9609-e335807bbb4c",
             "parent": null,
@@ -17,50 +24,103 @@ function getDefaultLevels() {
             "functions": [
                 {
                     "args": [
-                        "a1",
-                        "b1"
+                        "c0"
                     ],
                     "result": "c1",
                     "conditions": ""
                 },
                 {
                     "args": [
-                        "c2",
-                        "c3"
+                        "c1"
+                    ],
+                    "result": "c2",
+                    "conditions": ""
+                },
+                {
+                    "args": [
+                        "c2"
+                    ],
+                    "result": "c3",
+                    "conditions": "p1==1 && p2==1 && p3==1 && p4==1"
+                },
+                {
+                    "args": [
+                        "c2"
                     ],
                     "result": "c4",
+                    "conditions": "p1==1 && p2==1 && p3==1 && p4==0"
+                },
+                {
+                    "args": [
+                        "c3",
+                        "c5"
+                    ],
+                    "result": "c6",
                     "conditions": ""
                 }
             ]
         },
         {
-            "id": "5aae1a46-01a0-4e8d-9e20-732d90ae117b",
+            "id": "382337c0-803f-48e4-bbb1-b0466505c323",
             "parent": "baad85ac-1733-4f25-9609-e335807bbb4c",
             "level": 2,
             "number": 1,
             "functions": [
                 {
                     "args": [
-                        "a2",
-                        "b2"
+                        "c10"
                     ],
-                    "result": "c2",
+                    "result": "c11",
+                    "conditions": "p11==1 && p12==1 && p13==1 && p14==1"
+                },
+                {
+                    "args": [
+                        "c11"
+                    ],
+                    "result": "c12",
+                    "conditions": ""
+                },
+                {
+                    "args": [
+                        "c13"
+                    ],
+                    "result": "c14",
+                    "conditions": ""
+                },
+                {
+                    "args": [
+                        "c14"
+                    ],
+                    "result": "c5",
                     "conditions": ""
                 }
             ]
         },
         {
-            "id": "11339e7e-5079-450c-b7ce-21f3fc71d710",
-            "parent": "baad85ac-1733-4f25-9609-e335807bbb4c",
-            "level": 2,
-            "number": 2,
+            "id": "f2e39b89-bb0a-4820-8c9a-406dc453734c",
+            "parent": "382337c0-803f-48e4-bbb1-b0466505c323",
+            "level": 3,
+            "number": 1,
             "functions": [
                 {
                     "args": [
-                        "a3",
-                        "b3"
+                        "c20"
                     ],
-                    "result": "c3",
+                    "result": "c21",
+                    "conditions": "p141==1 && p142==1 && p143==1 && p144==1"
+                },
+                {
+                    "args": [
+                        "c21"
+                    ],
+                    "result": "c22",
+                    "conditions": ""
+                },
+                {
+                    "args": [
+                        "c22"
+                    ],
+                    "result": "c13",
                     "conditions": ""
                 }
             ]
@@ -141,7 +201,7 @@ export default class LevelEditor extends React.Component {
     initLevels() {
         try {
             const levels = JSON.parse(localStorage.getItem(LOCAL_STORAGE_ITEM));
-            if (!levels) {
+            if (!levels || getUrlParam("disableCache") === "true") {
                 return getDefaultLevels();
             }
             return levels;
@@ -151,6 +211,7 @@ export default class LevelEditor extends React.Component {
         }
     }
     saveLevels() {
+        debugger;
         localStorage.setItem(LOCAL_STORAGE_ITEM, JSON.stringify(this.state.levels));
     }
     componentDidMount() {

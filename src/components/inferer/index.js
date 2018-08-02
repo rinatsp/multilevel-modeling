@@ -31,9 +31,9 @@ export default class Inferer extends React.Component {
     }
     getTarget() {
         try {
-            const inferFrom = this.inferFromNode.value.split(',');
-            const inferTo = this.inferToNode.value;
-            const inferConditions = this.inferConditionsNode.value;
+            const inferFrom = this.inferFromNode.value.split(',').map(s => s.trim());
+            const inferTo = this.inferToNode.value.trim();
+            const inferConditions = this.inferConditionsNode.value.trim();
             if (inferFrom.length > 0 && inferTo) {
                 return {
                     from: inferFrom,
@@ -53,19 +53,19 @@ export default class Inferer extends React.Component {
                     <label className="form-label">
                         <span>Имея входные данные:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="a1,b1,a2,b2,a3,b3" />
+                    <input type="text" className="form-input infer-block__from" ref={(node) => { this.inferFromNode = node; }} defaultValue="c0, c10, c20" />
                 </div>
                 <div className="form-group">
                     <label className="form-label">
                         <span>И начальные условия:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__conditions" ref={(node) => { this.inferConditionsNode = node; }} defaultValue="a = 60, b = 11" />
+                    <input type="text" className="form-input infer-block__conditions" ref={(node) => { this.inferConditionsNode = node; }} defaultValue="p1=1, p2=1, p3=1, p4=1, p11=1, p12=1, p13=1, p14=1, p141=1, p142=1, p143=1, p144=1" />
                 </div>
                 <div className="form-group">
                     <label className="form-label">
                         <span>Возможно получить:</span>
                     </label>
-                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="c4" />
+                    <input type="text" className="form-input infer-block__to" ref={(node) => { this.inferToNode = node; }} defaultValue="c6" />
                 </div>
                 <button className="btn btn-primary" onClick={this.handleInfer}>Доказать</button>
             </div>
