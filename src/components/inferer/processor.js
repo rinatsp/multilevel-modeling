@@ -149,6 +149,7 @@ export default class Processor extends React.Component {
     }
     process() {
         const { items, target } = this.props;
+        target.from = target.from.split(',').map(s => s.trim());
         if (target && items) {
             const result = processMultilevel(items, target);
             this.setState({

@@ -210,8 +210,12 @@ export default class LevelEditor extends React.Component {
             return getDefaultLevels();
         }
     }
+    setLevels(levels) {
+        this.setState({
+            levels
+        });
+    }
     saveLevels() {
-        debugger;
         localStorage.setItem(LOCAL_STORAGE_ITEM, JSON.stringify(this.state.levels));
     }
     componentDidMount() {
