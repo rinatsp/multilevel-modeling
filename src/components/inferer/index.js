@@ -65,7 +65,8 @@ export default class Inferer extends React.Component {
         return;
     }
     renderInferBlock() {
-        const { from, to, conditions } = this.state.target;
+        const target = this.state.target || {};
+        const { from, to, conditions } = target;
         return (
             <div className="infer-block">
                 <div className="form-group">

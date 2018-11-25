@@ -44,10 +44,10 @@ function processMultilevel(items, finalTarget) {
         console.info(`trying to infer that ${target} is inferable from given start data ${finalTarget.from}, conditions ${finalTarget.conditions} and functions ${functions.map(printFunction)}`);
 
         // get one of functions of the item, that allow us to rich the result
-        function getFunctionLeadsTo(result) {
+        function getFunctionsLeadsTo(result) {
             console.debug(`looking for any function that would allow to rich result ${result}`);
             // find in all item's functions one, who are conditioned and which result is equal to given
-            return _.find(functions, (f) => {
+            return functions.filter((f) => {
                 return isConditioned(f, finalTarget.conditions) && f.result == result;
             });
         }
@@ -63,13 +63,24 @@ function processMultilevel(items, finalTarget) {
                 return localSteps;
             }
 
-            const lastFunction = getFunctionLeadsTo(result);
-            if (lastFunction) {
-                console.debug(`found last function for ${result}; checking all it's arguments`);
-                // for each argument of found function, check that we can find path to it
-                const prevSteps = _.flatten(lastFunction.args.map(findPath));
-                // concat the result path
-                localSteps = [...prevSteps, lastFunction];
+            const lastFunctions = getFunctionsLeadsTo(result);
+            if (lastFunctions && lastFunctions.length > 0) {
+                for (let i = 0; i < lastFunctions.length; i++) {
+                    const lastFunction = lastFunctions[i];
+                    console.debug(`found last function for ${result}; checking all it's arguments`);
+                    // for each argument of found function, check that we can find path to it
+                    try {
+                        const prevSteps = _.flatten(lastFunction.args.map(findPath));
+                        // concat the result path
+                        localSteps = [...prevSteps, lastFunction];
+                        break;
+                    } catch (e) {
+                        console.info(`failed to infer all path to function `, lastFunction, `; iterating next`);
+                    }
+                }
+                if (localSteps.length === 0) {
+                    throw new Error("none of last functions", lastFunctions, " are feasible");
+                }
             } else {
                 const chidlItems = getChildItems(item);
                 let isFound = false;
@@ -87,18 +98,6 @@ function processMultilevel(items, finalTarget) {
                 if (!isFound) {
                     throw new Error(`not found any function or item that leads to ${result}`);
                 }
-                /*
-                const lastItem = getItemLeadsTo(item, result);
-                if (lastItem) {
-                    console.debug(`found last item for ${result}; finding path inside of it`);
-                    // go down one step below on found item and current result
-                    const prevSteps = process(lastItem, result);
-                    localSteps = prevSteps;
-                } else {
-                    // interrupt
-                    throw new Error(`not found any function or item that leads to ${result}`);
-                }
-                */
             }
 
             return localSteps;
