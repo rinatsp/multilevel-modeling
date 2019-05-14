@@ -1,6 +1,7 @@
 import React from 'react';
 import FunctionItem from './function-item';
 import _ from 'lodash';
+import Tree from "./tree";
 
 function printFunction(f) {
     return JSON.stringify(f);
@@ -158,17 +159,20 @@ export default class Processor extends React.Component {
     }
     printResult(result) {
         return (
-            <div>
-                <p>Прямой ход:</p>
-                <ol>
-                    {result.map((f, index) => {
-                        return (
-                            <li key={index}>
-                                <FunctionItem {...f} />
-                            </li>
-                        );
-                    })}
-                </ol>
+            <div className="flex-container">
+                <div className='way-container'>
+                    <p>Прямой ход:</p>
+                    <ol>
+                        {result.map((f, index) => {
+                            return (
+                                <li key={index}>
+                                    <FunctionItem {...f} />
+                                </li>
+                            );
+                        })}
+                    </ol>
+                </div>
+                <Tree resultPath={result} items={this.props.items} target={this.props.target}></Tree>
             </div>
         );
     }
