@@ -1,5 +1,5 @@
 import React from 'react';
-import ByElementsChart from './charts/by-elements';
+import ByElementsChart from './by-elements';
 
 export default class ComplexityByElements extends React.Component {
     constructor() {
@@ -52,7 +52,7 @@ export default class ComplexityByElements extends React.Component {
         return (
             <div>
                 {this.renderCharts()}
-            </div> 
+            </div>
         );
     }
 }

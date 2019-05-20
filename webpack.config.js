@@ -81,7 +81,7 @@ var WEBPACK_CONFIG = {
             },
             {
                 // compile with babel
-                test: /\.js$/, exclude: /node_modules/, loader: 'babel', query: { presets: ['react', 'es2015'] }
+                test: /\.js$/, exclude: /node_modules/, loader: 'babel', query: { presets: ['react', 'es2015'], plugins: ['transform-object-rest-spread'] }
             },
             {
                 // if file is less than `limit`, it is inlined with dataURL(base64);

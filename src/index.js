@@ -1,12 +1,12 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-import App from './components/inferer/';
+import AppRouter from "./components/charts/app-router";
 
 require('./css/main.less');
 
 ReactDOM.render(
-    <App />,
+    <AppRouter />,
     document.querySelector('#root')
 );
 
