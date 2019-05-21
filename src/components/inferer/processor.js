@@ -157,7 +157,7 @@ export default class Processor extends React.Component {
             });
         }
     }
-    printResult(result) {
+    printResult(result, target) {
         return (
             <div className="flex-container">
                 <div className='way-container'>
@@ -172,7 +172,7 @@ export default class Processor extends React.Component {
                         })}
                     </ol>
                 </div>
-                <Tree resultPath={result} items={this.props.items} target={this.props.target}></Tree>
+                <Tree resultPath={result} items={this.props.items} target={target}></Tree>
             </div>
         );
     }
@@ -188,7 +188,7 @@ export default class Processor extends React.Component {
                 {
                     (result && result.length > 0) ?
                         <div>
-                            {this.printResult(result)}
+                            {this.printResult(result, target)}
                         </div> :
                         "Вывод невозможен"
                 }

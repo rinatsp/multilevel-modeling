@@ -89,7 +89,7 @@ class Cytoscape extends Component {
         conf.container = this.cyRef;
         conf.elements = nextProps.elements;
         const cy = cytoscape(conf);
-        this.state = { cy };
+        this.setState({cy: cy});
     }
 
     componentWillUnmount() {

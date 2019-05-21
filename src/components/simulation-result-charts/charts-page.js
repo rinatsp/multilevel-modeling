@@ -131,16 +131,16 @@ export class ChartsPage extends React.Component {
 
     inputInductive() {
         return (
-        <div>
-            <div>
+        <div className="flex-container">
+            <div className="input-block">
                 <label>Число элементов m</label>
-                <input type="number" value={this.state.inductive.m} onChange={this.handleChangeInductiveM.bind(this)}/>
+                <input className="form-input" type="number" value={this.state.inductive.m} onChange={this.handleChangeInductiveM.bind(this)}/>
             </div>
-            <div>
+            <div className="input-block">
                 <label>Число уровней k</label>
-                <input type="number"  value={this.state.inductive.k} onChange={this.handleChangeInductiveK.bind(this)}/>
+                <input className="form-input" type="number"  value={this.state.inductive.k} onChange={this.handleChangeInductiveK.bind(this)}/>
             </div>
-            <button onClick={this.buildInductiveSynthesizedChart.bind(this)}>Построить график</button>
+            <button className="btn" onClick={this.buildInductiveSynthesizedChart.bind(this)}>Построить график</button>
         </div>
         )
     }
@@ -196,36 +196,36 @@ export class ChartsPage extends React.Component {
 
     inputDeductive() {
         return (
-            <div>
-                <div>
+            <div className="flex-container">
+                <div className="input-block">
                     <label> Число элементов r-ой структуры </label>
-                    <input value={this.state.deductive.m_r} onChange={this.handleChangeDeductiveM_R.bind(this)}/>
+                    <input className="form-input" value={this.state.deductive.m_r} onChange={this.handleChangeDeductiveM_R.bind(this)}/>
                 </div>
-                <div>
+                <div className="input-block">
                     <label> Число элементов s-ой структуры </label>
-                    <input value={this.state.deductive.m_s} onChange={this.handleChangeDeductiveM_S.bind(this)}/>
+                    <input className="form-input" value={this.state.deductive.m_s} onChange={this.handleChangeDeductiveM_S.bind(this)}/>
                 </div>
-                <div>
+                <div className="input-block">
                     <label> Распределение по уровням r-ой структуры </label>
-                    <input value={this.state.deductive.n_r} onChange={this.handleChangeDeductiveN_R.bind(this)}/>
+                    <input className="form-input" value={this.state.deductive.n_r} onChange={this.handleChangeDeductiveN_R.bind(this)}/>
                 </div>
-                <div>
+                <div className="input-block">
                     <label> Распределение по уровням  s-ой структуры </label>
-                    <input value={this.state.deductive.n_s} onChange={this.handleChangeDeductiveN_S.bind(this)}/>
+                    <input className="form-input" value={this.state.deductive.n_s} onChange={this.handleChangeDeductiveN_S.bind(this)}/>
                 </div>
-                <button onClick={this.buildDeductiveRecoveringChart.bind(this)}>Построить график</button>
+                <button className="btn" onClick={this.buildDeductiveRecoveringChart.bind(this)}>Построить график</button>
             </div>
         )
     }
 
 
     inputParameterizationDeductive() {
-       return(<div>
-            <div>
+       return(<div className="flex-container">
+            <div className="input-block">
                 <label> Пространство параметров элементов</label>
                 <input value={this.state.deductive.m_v} onChange={this.handleChangeDeductiveM_V.bind(this)}/>
             </div>
-            <button onClick={this.buildParameterizationDeductiveChart.bind(this)}>Построить график</button>
+            <button className="btn" onClick={this.buildParameterizationDeductiveChart.bind(this)}>Построить график</button>
         </div>)
     }
 
@@ -259,11 +259,13 @@ export class ChartsPage extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="charts-container">
                 <div>
                     {this.inputInductive()}
-                    <BaseChart  headerChart={"Сложность синтезируемой модели"} labels={this.state.inductive.charts.labels} data={this.state.inductive.charts.synthesizedData }/>
-                    <BaseChart headerChart={"Сложность восстановления зависимостей"} labels={this.state.inductive.charts.labels} data={this.state.inductive.charts.recoveringData }/>
+                    <div className="chart-container">
+                        <BaseChart  headerChart={"Сложность синтезируемой модели"} labels={this.state.inductive.charts.labels} data={this.state.inductive.charts.synthesizedData }/>
+                        <BaseChart  headerChart={"Сложность восстановления зависимостей"} labels={this.state.inductive.charts.labels} data={this.state.inductive.charts.recoveringData }/>
+                    </div>
                 </div>
                 <div>
                     {this.inputDeductive()}

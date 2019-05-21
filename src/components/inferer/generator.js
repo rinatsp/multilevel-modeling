@@ -99,7 +99,7 @@ function generateConfig(data) {
     return {
         items,
         target: {
-            from: startFacts.join(","),
+            from: startFacts,
             to: "w",
             conditions: ""
         }

@@ -53,12 +53,12 @@ export class BaseChart extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="chart">
                 <h2>{this.props.headerChart}</h2>
                 <Bar
                     data={this.state.data}
-                    width={100}
-                    height={50}
+                    maxWidth={400}
+                    maxHeight={400}
                     options={{
                         maintainAspectRatio: false
                     }}
